@@ -34,16 +34,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-    /* 1. Define OpenDyslexic Manually (Reliable Source) */
+    /* 1. Define OpenDyslexic Locally */
     @font-face {
         font-family: 'OpenDyslexic';
-        src: url('https://cdn.jsdelivr.net/gh/antijingoist/open-dyslexic@master/open-dyslexic-regular.woff') format('woff');
+        /* Looks for file in the same folder */
+        src: url('OpenDyslexic-Regular.otf') format('opentype'); 
         font-weight: normal;
         font-style: normal;
     }
+
     @font-face {
         font-family: 'OpenDyslexic';
-        src: url('https://cdn.jsdelivr.net/gh/antijingoist/open-dyslexic@master/open-dyslexic-bold.woff') format('woff');
+        src: url('OpenDyslexic-Bold.otf') format('opentype');
         font-weight: bold;
         font-style: normal;
     }
@@ -53,29 +55,22 @@
     h1, h2, h3, h4 { font-family: 'Roboto Slab', serif; }
 
     /* 3. Dyslexia Override */
-    /* We use !important to force this font over everything else when active */
     .dyslexic-mode, .dyslexic-mode * {
         font-family: 'OpenDyslexic', sans-serif !important;
     }
 
-    /* 4. Image Zoom Transition */
+    /* ... (Keep the rest of your Print and Image Zoom styles below) ... */
+    
+    /* Image Zoom Transition */
     .image-modal { transition: opacity 0.3s ease; }
 
-    /* 5. Print Optimization */
+    /* Print Optimization */
     @media print {
         @page { margin: 2cm; size: auto; }
         body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; }
-        
-        /* Hide UI elements */
         #sidebar, #mobile-nav-toggle, #dyslexia-toggle, #print-btn, .no-print { display: none !important; }
-        
-        /* Expand content */
         #main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
-        
-        /* Ensure inputs are visible */
         textarea, input[type="text"] { border: 1px solid #000; color: #000; }
-        
-        /* Page breaks */
         .page-break { page-break-before: always; }
         section { page-break-inside: avoid; }
     }

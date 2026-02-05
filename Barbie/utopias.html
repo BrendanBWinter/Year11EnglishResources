@@ -33,57 +33,53 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
 
-    <style>
-        /* FIX: Manually define OpenDyslexic here to ensure it loads 
-           without cross-origin errors on local files.
-        */
-        @font-face {
-            font-family: 'OpenDyslexic';
-            src: url('https://cdn.jsdelivr.net/npm/opendyslexic@2.1.0/fonts/OpenDyslexic-Regular.woff') format('woff');
-            font-weight: normal;
-            font-style: normal;
-        }
-        @font-face {
-            font-family: 'OpenDyslexic';
-            src: url('https://cdn.jsdelivr.net/npm/opendyslexic@2.1.0/fonts/OpenDyslexic-Bold.woff') format('woff');
-            font-weight: bold;
-            font-style: normal;
-        }
+<style>
+    /* 1. Define OpenDyslexic Manually (Reliable Source) */
+    @font-face {
+        font-family: 'OpenDyslexic';
+        src: url('https://cdn.jsdelivr.net/gh/antijingoist/open-dyslexic@master/open-dyslexic-regular.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+    @font-face {
+        font-family: 'OpenDyslexic';
+        src: url('https://cdn.jsdelivr.net/gh/antijingoist/open-dyslexic@master/open-dyslexic-bold.woff') format('woff');
+        font-weight: bold;
+        font-style: normal;
+    }
 
-        /* Base styles */
-        body { font-family: 'Inter', sans-serif; transition: font-family 0.3s ease; }
-        h1, h2, h3, h4 { font-family: 'Roboto Slab', serif; }
+    /* 2. Base Styles */
+    body { font-family: 'Inter', sans-serif; }
+    h1, h2, h3, h4 { font-family: 'Roboto Slab', serif; }
 
-        /* Dyslexia Override - using !important to force override Tailwind classes */
-        .dyslexic-mode, 
-        .dyslexic-mode h1, 
-        .dyslexic-mode h2, 
-        .dyslexic-mode h3, 
-        .dyslexic-mode h4, 
-        .dyslexic-mode p, 
-        .dyslexic-mode span, 
-        .dyslexic-mode button, 
-        .dyslexic-mode input, 
-        .dyslexic-mode textarea, 
-        .dyslexic-mode li {
-            font-family: 'OpenDyslexic', sans-serif !important;
-            line-height: 1.6 !important; /* increased line height for readability */
-        }
+    /* 3. Dyslexia Override */
+    /* We use !important to force this font over everything else when active */
+    .dyslexic-mode, .dyslexic-mode * {
+        font-family: 'OpenDyslexic', sans-serif !important;
+    }
 
-        /* Image Zoom Transition */
-        .image-modal { transition: opacity 0.3s ease; }
+    /* 4. Image Zoom Transition */
+    .image-modal { transition: opacity 0.3s ease; }
 
-        /* Print Optimization */
-        @media print {
-            @page { margin: 2cm; size: auto; }
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; }
-            #sidebar, #mobile-nav-toggle, #dyslexia-toggle, #print-btn, .no-print { display: none !important; }
-            #main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
-            textarea, input[type="text"] { border: 1px solid #000; color: #000; }
-            .page-break { page-break-before: always; }
-            section { page-break-inside: avoid; }
-        }
-    </style>
+    /* 5. Print Optimization */
+    @media print {
+        @page { margin: 2cm; size: auto; }
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; }
+        
+        /* Hide UI elements */
+        #sidebar, #mobile-nav-toggle, #dyslexia-toggle, #print-btn, .no-print { display: none !important; }
+        
+        /* Expand content */
+        #main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
+        
+        /* Ensure inputs are visible */
+        textarea, input[type="text"] { border: 1px solid #000; color: #000; }
+        
+        /* Page breaks */
+        .page-break { page-break-before: always; }
+        section { page-break-inside: avoid; }
+    }
+</style>
 </head>
 
 <body class="bg-gray-50 text-dark"

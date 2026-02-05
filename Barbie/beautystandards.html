@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ever-Changing Face of Beauty</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom Chart Container Styling for Responsiveness and Constraints */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Constraint to prevent excessive width */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height */
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px; /* Taller on desktop */
+            }
+        }
+        
+        /* Custom Scrollbar for text areas */
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Stone/Warm Gray) with Soft Rose and Amber accents for a calm, historical, yet modern feel. -->
+    <!-- Application Structure Plan: 
+         1. Hero Section: Sets the thesis (Beauty is a construct).
+         2. Time Travel Dashboard: The core interactive element. Users select an era to see text details alongside a comparative Radar Chart ("The Shape of Beauty") that visualizes abstract metrics like 'Curviness' or 'Artificiality'. This transforms qualitative descriptions into quantitative comparisons.
+         3. Trend Velocity Analysis: A section analyzing the speed of change, visualized with a Line Chart, plus an interactive Vocabulary deck.
+         4. Knowledge Check: An interactive quiz section to test understanding without leaving the flow.
+         Rationale: This structure breaks the linear report into an explorative dashboard, allowing users to compare eras directly rather than reading sequentially. -->
+    <!-- Visualization & Content Choices:
+         1. Radar Chart (Chart.js): Used in the 'Time Travel' section. Goal: Compare eras. Justification: Shows how the 'shape' of beauty shifts across multiple dimensions (Curves, Thinness, Makeup, etc.) simultaneously.
+         2. Line Chart (Chart.js): Used in 'Trend Analysis'. Goal: Show the acceleration of trends. Justification: Visually demonstrates the 'Fast Fashion/Algorithm' concept of the 2020s vs Victorian stasis.
+         3. Interactive Cards: For Vocabulary. Goal: Engagement. Justification: Flip/Expansion interaction aids memory retention.
+         4. Quiz Form: For Assessment. Goal: Validation. Justification: Immediate feedback loop reinforces learning.
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans antialiased selection:bg-rose-200 selection:text-stone-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-serif font-bold text-rose-900 tracking-wide">Beauty<span class="text-stone-500">Construct</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <button onclick="scrollToSection('hero')" class="text-stone-600 hover:text-rose-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Introduction</button>
+                    <button onclick="scrollToSection('eras')" class="text-stone-600 hover:text-rose-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Timeline Analysis</button>
+                    <button onclick="scrollToSection('trends')" class="text-stone-600 hover:text-rose-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Trends & Vocab</button>
+                    <button onclick="scrollToSection('quiz')" class="bg-rose-900 text-white hover:bg-rose-800 px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-md">Knowledge Check</button>
+                </div>
+                <!-- Mobile menu button stub (functional in full implementations, kept simple here) -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-stone-500 hover:text-stone-900 p-2">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-stone-50 border-t border-stone-200">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <button onclick="scrollToSection('hero')" class="block w-full text-left px-3 py-2 text-stone-600 hover:bg-rose-50 rounded-md">Introduction</button>
+                <button onclick="scrollToSection('eras')" class="block w-full text-left px-3 py-2 text-stone-600 hover:bg-rose-50 rounded-md">Timeline Analysis</button>
+                <button onclick="scrollToSection('trends')" class="block w-full text-left px-3 py-2 text-stone-600 hover:bg-rose-50 rounded-md">Trends & Vocab</button>
+                <button onclick="scrollToSection('quiz')" class="block w-full text-left px-3 py-2 text-rose-700 font-bold hover:bg-rose-50 rounded-md">Knowledge Check</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="pt-12 pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="text-center max-w-3xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-serif font-bold text-stone-900 mb-6 leading-tight">
+                Beauty is Not a Rule.<br><span class="text-rose-700">It's a Trend.</span>
+            </h1>
+            <p class="mt-4 text-xl text-stone-600 leading-relaxed">
+                Beauty standards are not fixed or "natural." They are shifting ideas created by society, influenced by technology, politics, and the economy. Explore how the "perfect" ideal has transformed from the Victorian era to the Algorithmic age.
+            </p>
+            <div class="mt-8 flex justify-center gap-4">
+                <div class="flex items-center gap-2 text-sm text-stone-500 bg-white px-4 py-2 rounded-full shadow-sm border border-stone-200">
+                    <span class="text-xl">🏛️</span> Politics
+                </div>
+                <div class="flex items-center gap-2 text-sm text-stone-500 bg-white px-4 py-2 rounded-full shadow-sm border border-stone-200">
+                    <span class="text-xl">💰</span> Economy
+                </div>
+                <div class="flex items-center gap-2 text-sm text-stone-500 bg-white px-4 py-2 rounded-full shadow-sm border border-stone-200">
+                    <span class="text-xl">📱</span> Technology
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Eras Timeline -->
+    <section id="eras" class="py-12 bg-white border-y border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Section Context -->
+            <div class="mb-10 max-w-4xl">
+                <h2 class="text-3xl font-serif font-bold text-stone-900 mb-4">Timeline Analysis: The Shape of Beauty</h2>
+                <p class="text-lg text-stone-600">
+                    This interactive dashboard allows you to examine specific historical eras. Select a time period below to reveal how societal pressures—from Victorian class systems to modern algorithms—reshaped the "ideal" body. The radar chart on the right visualizes the shifting emphasis of beauty standards across five key dimensions.
+                </p>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Controls & Content (Left) -->
+                <div class="lg:col-span-5 flex flex-col gap-6">
+                    <!-- Era Selectors -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button onclick="updateEra('victorian')" id="btn-victorian" class="era-btn active bg-rose-100 border-rose-500 text-rose-900 border px-4 py-3 rounded-lg text-sm font-semibold transition-all hover:shadow-md">
+                            1837-1901<br><span class="text-xs font-normal">Victorian</span>
+                        </button>
+                        <button onclick="updateEra('1950s')" id="btn-1950s" class="era-btn bg-stone-50 border-stone-200 text-stone-600 border px-4 py-3 rounded-lg text-sm font-semibold transition-all hover:bg-stone-100 hover:shadow-md">
+                            1950s<br><span class="text-xs font-normal">Post-War</span>
+                        </button>
+                        <button onclick="updateEra('1990s')" id="btn-1990s" class="era-btn bg-stone-50 border-stone-200 text-stone-600 border px-4 py-3 rounded-lg text-sm font-semibold transition-all hover:bg-stone-100 hover:shadow-md">
+                            1990s<br><span class="text-xs font-normal">Heroin Chic</span>
+                        </button>
+                        <button onclick="updateEra('2020s')" id="btn-2020s" class="era-btn bg-stone-50 border-stone-200 text-stone-600 border px-4 py-3 rounded-lg text-sm font-semibold transition-all hover:bg-stone-100 hover:shadow-md">
+                            2020s<br><span class="text-xs font-normal">Algorithmic</span>
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Content Card -->
+                    <div class="bg-stone-50 rounded-xl p-6 border border-stone-200 shadow-sm flex-grow fade-in" id="era-content">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl" id="era-icon">⏳</span>
+                            <h3 class="text-2xl font-bold text-stone-800" id="era-title">Select an Era</h3>
+                        </div>
+                        <div class="prose prose-stone text-stone-600 mb-6" id="era-description">
+                            <p>Click the buttons above to explore how beauty standards have changed over time.</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg p-4 border border-stone-100">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Key Traits</h4>
+                            <ul class="space-y-2 text-sm text-stone-700" id="era-traits">
+                                <!-- JS Populates this -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualization (Right) -->
+                <div class="lg:col-span-7 flex flex-col justify-center">
+                    <div class="bg-white rounded-xl shadow-lg border border-stone-100 p-4 md:p-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-stone-700">Metric Analysis</h3>
+                            <span class="text-xs bg-stone-100 text-stone-500 px-2 py-1 rounded">Radar Chart</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <p class="text-xs text-stone-400 italic">Comparing dimensions of beauty standards across eras.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trends & Vocabulary -->
+    <section id="trends" class="py-12 bg-stone-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <!-- Trend Speed Analysis -->
+                <div>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-serif font-bold text-stone-900 mb-3">The Acceleration of Trends</h2>
+                        <p class="text-stone-600 text-sm leading-relaxed">
+                            One of the most significant changes in beauty history is the <strong>speed</strong> at which standards shift. While Victorian ideals lasted decades, the "Fast Fashion" and "Algorithmic" nature of the 2020s means micro-trends rise and fall in weeks.
+                        </p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="trendLineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Deck -->
+                <div>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-serif font-bold text-stone-900 mb-3">Key Vocabulary</h2>
+                        <p class="text-stone-600 text-sm leading-relaxed">
+                            Understanding the language used to describe these phenomena is crucial. Use the interactive list below to explore key terms from the report.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                        <div class="p-4 bg-stone-100 border-b border-stone-200 flex justify-between items-center">
+                            <h3 class="font-bold text-stone-700">Term Definitions</h3>
+                            <span class="text-xs text-stone-500">5 Terms</span>
+                        </div>
+                        <div class="divide-y divide-stone-100 max-h-[300px] overflow-y-auto custom-scroll" id="vocab-list">
+                            <!-- JS Generated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Knowledge Check -->
+    <section id="quiz" class="py-16 bg-rose-50 border-t border-rose-100">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-serif font-bold text-rose-900 mb-4">Check Your Understanding</h2>
+                <p class="text-rose-800/80">
+                    Apply what you've learned about the history of beauty standards. Answer the questions below to test your knowledge.
+                </p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Question 1 -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-rose-400">
+                    <p class="font-bold text-stone-800 text-lg mb-4">1. Why was pale skin considered beautiful during the Victorian era?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-stone-200 cursor-pointer hover:bg-stone-50 transition-colors">
+                            <input type="radio" name="q1" value="a" class="h-4 w-4 text-rose-600 focus:ring-rose-500">
+                            <span class="text-stone-700">It showed that a person was strong and healthy.</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-stone-200 cursor-pointer hover:bg-stone-50 transition-colors">
+                            <input type="radio" name="q1" value="b" class="h-4 w-4 text-rose-600 focus:ring-rose-500">
+                            <span class="text-stone-700">It showed that a person was wealthy and did not have to work outdoors.</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-stone-200 cursor-pointer hover:bg-stone-50 transition-colors">
+                            <input type="radio" name="q1" value="c" class="h-4 w-4 text-rose-600 focus:ring-rose-500">
+                            <span class="text-stone-700">It was a side effect of wearing tight corsets.</span>
+                        </label>
+                    </div>
+                    <div id="feedback-q1" class="mt-4 hidden p-3 rounded bg-stone-100 text-sm"></div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-rose-400">
+                    <p class="font-bold text-stone-800 text-lg mb-4">2. Which era focused on a "put together" look with perfectly styled hair and matching accessories?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-stone-200 cursor-pointer hover:bg-stone-50 transition-colors">
+                            <input type="radio" name="q2" value="a" class="h-4 w-4 text-rose-600 focus:ring-rose-500">
+                            <span class="text-stone-700">The Victorian Era</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-stone-200 cursor-pointer hover:bg-stone-50 transition-colors">
+                            <input type="radio" name="q2" value="b" class="h-4 w-4 text-rose-600 focus:ring-rose-500">
+                            <span class="text-stone-700">The 1950s</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-stone-200 cursor-pointer hover:bg-stone-50 transition-colors">
+                            <input type="radio" name="q2" value="c" class="h-4 w-4 text-rose-600 focus:ring-rose-500">
+                            <span class="text-stone-700">The 1990s</span>
+                        </label>
+                    </div>
+                    <div id="feedback-q2" class="mt-4 hidden p-3 rounded bg-stone-100 text-sm"></div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-rose-400">
+                    <p class="font-bold text-stone-800 text-lg mb-4">3. How does the 2020s "Social Media" era differ from previous historical periods?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-stone-200 cursor-pointer hover:bg-stone-50 transition-colors">
+                            <input type="radio" name="q3" value="b" class="h-4 w-4 text-rose-600 focus:ring-rose-500">
+                            <span class="text-stone-700">People no longer care about how they look.</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-stone-200 cursor-pointer hover:bg-stone-50 transition-colors">
+                            <input type="radio" name="q3" value="c" class="h-4 w-4 text-rose-600 focus:ring-rose-500">
+                            <span class="text-stone-700">Technology and computer programs influence what we think is beautiful.</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-stone-200 cursor-pointer hover:bg-stone-50 transition-colors">
+                            <input type="radio" name="q3" value="d" class="h-4 w-4 text-rose-600 focus:ring-rose-500">
+                            <span class="text-stone-700">It is the first time in history that people have used makeup.</span>
+                        </label>
+                    </div>
+                    <div id="feedback-q3" class="mt-4 hidden p-3 rounded bg-stone-100 text-sm"></div>
+                </div>
+                
+                <div class="text-center pt-6">
+                    <button onclick="checkQuiz()" class="bg-rose-900 text-white hover:bg-rose-800 px-8 py-3 rounded-full text-lg font-bold shadow-lg transition-transform hover:-translate-y-1">Submit Answers</button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-sm">Based on the report: "The Ever-Changing Face of Beauty"</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA STORE ---
+        const eraData = {
+            'victorian': {
+                title: "Victorian Era (1837–1901)",
+                icon: "👒",
+                desc: "Beauty was linked to social rank. A pale, 'fragile' look was attractive because it showed wealth (staying indoors). Women used tight corsets to create an exaggerated 'hourglass' shape.",
+                traits: [
+                    "Pale, 'fragile' skin (sign of wealth)",
+                    "Exaggerated hourglass (Corsets)",
+                    "Makeup seen as 'improper'",
+                    "Pinched cheeks for natural color"
+                ],
+                // Radar Data: [Curviness, Thinness, Visible Makeup, Artificiality, Health Signaling]
+                // Victorian: High Curve (Corset), Mod Thin, Low Makeup, High Artifical (Corset), Low Health (Fragile)
+                stats: [9, 5, 1, 8, 2] 
+            },
+            '1950s': {
+                title: "The 1950s: Post-War Ideal",
+                icon: "💄",
+                desc: "A return to structured, 'ultra-feminine' looks. The ideal was the 'curvy hourglass' (movie stars). Unlike the Victorian era, a healthy, glowing complexion was preferred.",
+                traits: [
+                    "Curvy hourglass figure",
+                    "Healthy, glowing complexion",
+                    "Perfectly styled hair",
+                    "Matching accessories ('Put together')"
+                ],
+                // 1950s: High Curve, Low Thin, High Makeup, Mod Artificial, High Health
+                stats: [8, 3, 8, 6, 8]
+            },
+            '1990s': {
+                title: "The 1990s: 'Heroin Chic'",
+                icon: "🎸",
+                desc: "A shift away from glamour. 'Heroin chic' moved toward a thin, frail body type with pale skin and dark circles. A rebellion against the athletic 1980s.",
+                traits: [
+                    "Very thin, 'waif-like' body",
+                    "Pale skin, dark circles",
+                    "Rebellion against glamour",
+                    "Influenced by Grunge music"
+                ],
+                // 1990s: Low Curve, High Thin, Mod Makeup (Grunge), Low Artificial, Low Health
+                stats: [2, 10, 5, 3, 2]
+            },
+            '2020s': {
+                title: "The 2020s: Algorithmic Beauty",
+                icon: "🤳",
+                desc: "Influenced by Instagram and TikTok. The 'Instagram Face' includes high cheekbones and large lips. Trends change weekly due to algorithms and filters.",
+                traits: [
+                    "Instagram Face (High cheekbones, large lips)",
+                    "Fast Fashion / Micro-trends",
+                    "Heavy influence of Filters/Editing",
+                    "Algorithmic pressure"
+                ],
+                // 2020s: Mod Curve, Mod Thin, High Makeup, High Artificial (Filters), Mod Health
+                stats: [7, 6, 9, 10, 5]
+            }
+        };
+
+        const vocabData = [
+            { word: "Satirise", def: "To use humor or exaggeration to show that something is foolish or bad.", ex: "The film aims to satirise the beauty industry." },
+            { word: "Status", def: "A person's rank or importance in a group or society.", ex: "Pale skin was a sign of high social status." },
+            { word: "Fragile", def: "Easily broken, damaged, or appearing weak and delicate.", ex: "Women tried to look fragile to appear elegant." },
+            { word: "Exaggerated", def: "Representing something as being larger or more extreme than it really is.", ex: "Filters create an exaggerated version of features." },
+            { word: "Algorithm", def: "A set of rules followed by a computer to make decisions or show content.", ex: "The algorithm decides which trends become popular." }
+        ];
+
+        // --- CHART INSTANCES ---
+        let radarChartInstance = null;
+        let lineChartInstance = null;
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initVocab();
+            initCharts();
+            updateEra('victorian'); // Default view
+        });
+
+        // --- NAVIGATION ---
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- ERA LOGIC ---
+        function updateEra(eraKey) {
+            const data = eraData[eraKey];
+            
+            // 1. Update Buttons Styling
+            document.querySelectorAll('.era-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-rose-100', 'border-rose-500', 'text-rose-900');
+                btn.classList.add('bg-stone-50', 'border-stone-200', 'text-stone-600');
+            });
+            const activeBtn = document.getElementById(`btn-${eraKey}`);
+            activeBtn.classList.remove('bg-stone-50', 'border-stone-200', 'text-stone-600');
+            activeBtn.classList.add('active', 'bg-rose-100', 'border-rose-500', 'text-rose-900');
+
+            // 2. Update Content Text (with simple fade animation reset)
+            const contentContainer = document.getElementById('era-content');
+            contentContainer.classList.remove('fade-in');
+            void contentContainer.offsetWidth; // trigger reflow
+            contentContainer.classList.add('fade-in');
+
+            document.getElementById('era-icon').textContent = data.icon;
+            document.getElementById('era-title').textContent = data.title;
+            document.getElementById('era-description').innerHTML = `<p>${data.desc}</p>`;
+            
+            const traitsList = document.getElementById('era-traits');
+            traitsList.innerHTML = data.traits.map(t => `<li class="flex items-start"><span class="text-rose-500 mr-2">•</span>${t}</li>`).join('');
+
+            // 3. Update Chart
+            updateRadarChart(data.stats, data.title);
+        }
+
+        // --- VOCAB LOGIC ---
+        function initVocab() {
+            const container = document.getElementById('vocab-list');
+            container.innerHTML = vocabData.map(item => `
+                <div class="p-4 hover:bg-stone-50 transition-colors group">
+                    <div class="flex justify-between items-baseline mb-1">
+                        <span class="font-bold text-rose-800 text-lg">${item.word}</span>
+                    </div>
+                    <p class="text-sm text-stone-700 font-medium mb-1">${item.def}</p>
+                    <p class="text-xs text-stone-500 italic">"${item.ex}"</p>
+                </div>
+            `).join('');
+        }
+
+        // --- CHART LOGIC ---
+        function initCharts() {
+            // 1. Radar Chart Setup
+            const ctxRadar = document.getElementById('radarChart').getContext('2d');
+            radarChartInstance = new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['Curviness', 'Thinness', 'Visible Makeup', 'Artificiality', 'Health Signaling'],
+                    datasets: [{
+                        label: 'Beauty Focus',
+                        data: [0,0,0,0,0], // Placeholder, filled by updateEra
+                        backgroundColor: 'rgba(225, 29, 72, 0.2)', // Rose-600 with opacity
+                        borderColor: 'rgba(225, 29, 72, 1)',
+                        pointBackgroundColor: 'rgba(225, 29, 72, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(225, 29, 72, 1)'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e7e5e4' }, // stone-200
+                            grid: { color: '#e7e5e4' },
+                            pointLabels: {
+                                font: { size: 12, family: 'sans-serif' },
+                                color: '#44403c' // stone-700
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 10,
+                            ticks: { display: false } // Hide numbers for cleaner look
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // 2. Line Chart Setup (Trend Acceleration)
+            const ctxLine = document.getElementById('trendLineChart').getContext('2d');
+            lineChartInstance = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['1837 (Victorian)', '1920', '1950', '1990', '2010', '2024'],
+                    datasets: [{
+                        label: 'Speed of Trend Cycles',
+                        data: [1, 2, 3, 5, 8, 20], // Conceptual data: Low speed to High speed
+                        borderColor: '#f59e0b', // Amber-500
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Rate of Change' },
+                            grid: { display: false }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if(context.parsed.x === 5) return "Weekly micro-trends (Algorithms)";
+                                    if(context.parsed.x === 0) return "Decades of consistency";
+                                    return "Increasing speed";
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateRadarChart(newData, label) {
+            if (radarChartInstance) {
+                radarChartInstance.data.datasets[0].data = newData;
+                radarChartInstance.data.datasets[0].label = label;
+                radarChartInstance.update();
+            }
+        }
+
+        // --- QUIZ LOGIC ---
+        function checkQuiz() {
+            const answers = {
+                q1: 'b', // Wealth/No work
+                q2: 'b', // 1950s
+                q3: 'c'  // Tech influence
+            };
+
+            let score = 0;
+            let total = 3;
+
+            for (let q in answers) {
+                const selected = document.querySelector(`input[name="${q}"]:checked`);
+                const feedbackDiv = document.getElementById(`feedback-${q}`);
+                feedbackDiv.classList.remove('hidden', 'bg-green-100', 'bg-red-100', 'text-green-800', 'text-red-800');
+
+                if (selected) {
+                    if (selected.value === answers[q]) {
+                        score++;
+                        feedbackDiv.textContent = "✅ Correct!";
+                        feedbackDiv.classList.add('bg-green-100', 'text-green-800');
+                    } else {
+                        feedbackDiv.textContent = "❌ Incorrect. Try reviewing the text.";
+                        feedbackDiv.classList.add('bg-red-100', 'text-red-800');
+                    }
+                    feedbackDiv.classList.remove('hidden');
+                } else {
+                    feedbackDiv.textContent = "⚠️ Please select an answer.";
+                    feedbackDiv.classList.add('bg-stone-200', 'text-stone-800');
+                    feedbackDiv.classList.remove('hidden');
+                }
+            }
+        }
+
+    </script>
+</body>
+</html>

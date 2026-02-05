@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-World Attempts at a Perfect Society</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#002550',
+                        forest: '#004712',
+                        gold: '#ad926b',
+                        dark: '#1f2937',
+                    },
+                    fontFamily: {
+                        heading: ['"Roboto Slab"', 'serif'],
+                        body: ['"Inter"', 'sans-serif'],
+                        dyslexic: ['"OpenDyslexic"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/opendyslexic@2.1.0-beta1/font/opendyslexic.min.css" rel="stylesheet">
+
+    <style>
+        /* Base styles */
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4 { font-family: 'Roboto Slab', serif; }
+
+        /* Dyslexia Override */
+        .dyslexic-mode, .dyslexic-mode * {
+            font-family: 'OpenDyslexic', sans-serif !important;
+        }
+
+        /* Image Zoom Transition */
+        .image-modal { transition: opacity 0.3s ease; }
+
+        /* Print Optimization */
+        @media print {
+            @page { margin: 2cm; size: auto; }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; }
+            
+            /* Hide UI elements */
+            #sidebar, #mobile-nav-toggle, #dyslexia-toggle, #print-btn, .no-print { display: none !important; }
+            
+            /* Expand content */
+            #main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
+            
+            /* Ensure inputs are visible */
+            textarea, input[type="text"] { border: 1px solid #000; color: #000; }
+            
+            /* Page breaks */
+            .page-break { page-break-before: always; }
+            section { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-dark"
+      x-data="{ 
+          sidebarOpen: false, 
+          dyslexicMode: false,
+          modalOpen: false,
+          modalImg: '',
+          modalCaption: '',
+          
+          // Quiz Logic
+          showResults: false,
+          answers: { q1: '', q2: '', q3: '' },
+          checkAnswers() { this.showResults = true; },
+          resetQuiz() { this.showResults = false; this.answers = { q1: '', q2: '', q3: '' }; },
+          
+          // Image Zoom Function
+          openModal(src, caption) {
+              this.modalImg = src;
+              this.modalCaption = caption;
+              this.modalOpen = true;
+          }
+      }"
+      :class="{ 'dyslexic-mode': dyslexicMode }">
+
+    <header class="lg:hidden fixed top-0 w-full bg-navy text-white z-50 flex justify-between items-center p-4 shadow-md no-print">
+        <h1 class="text-lg font-heading font-bold">Utopian Societies</h1>
+        <div class="flex items-center gap-4">
+            <button @click="dyslexicMode = !dyslexicMode" class="text-gold font-bold text-sm border border-gold px-2 py-1 rounded hover:bg-gold hover:text-navy transition">
+                Aa
+            </button>
+            <button @click="sidebarOpen = !sidebarOpen" class="text-white focus:outline-none">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <aside id="sidebar" 
+           class="fixed inset-y-0 left-0 w-64 bg-navy text-white transform transition-transform duration-300 z-40 lg:translate-x-0 overflow-y-auto"
+           :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+        
+        <div class="p-6">
+            <h2 class="text-2xl font-heading font-bold text-gold mb-2">Navigation</h2>
+            <p class="text-xs text-gray-300 mb-6">Real-World Attempts at a Perfect Society</p>
+            
+            <button @click="dyslexicMode = !dyslexicMode" class="w-full mb-6 flex items-center justify-center gap-2 bg-forest text-white py-2 rounded hover:bg-gold hover:text-navy transition border border-gray-600">
+                <span x-text="dyslexicMode ? 'Disable Dyslexia Font' : 'Enable Dyslexia Font'"></span>
+            </button>
+
+            <nav class="space-y-3">
+                <a href="#intro" class="block hover:text-gold transition" @click="sidebarOpen = false">Introduction</a>
+                <a href="#oneida" class="block hover:text-gold transition ml-2" @click="sidebarOpen = false">1. The Oneida Community</a>
+                <a href="#fordlandia" class="block hover:text-gold transition ml-2" @click="sidebarOpen = false">2. Fordlândia</a>
+                <a href="#auroville" class="block hover:text-gold transition ml-2" @click="sidebarOpen = false">3. Auroville</a>
+                <a href="#venus" class="block hover:text-gold transition ml-2" @click="sidebarOpen = false">4. The Venus Project</a>
+                <hr class="border-gray-600 my-4">
+                <a href="#resources" class="block font-bold text-gold hover:text-white transition" @click="sidebarOpen = false">Student Resources</a>
+                <a href="#quiz" class="block hover:text-gold transition ml-2" @click="sidebarOpen = false">Quiz</a>
+                <a href="#activity" class="block hover:text-gold transition ml-2" @click="sidebarOpen = false">CER Draft</a>
+            </nav>
+        </div>
+    </aside>
+
+    <main id="main-content" class="lg:ml-64 p-6 lg:p-12 pt-20 lg:pt-12 max-w-5xl mx-auto">
+        
+        <div class="border-b-4 border-navy mb-8 pb-4">
+            <h1 class="text-4xl lg:text-5xl font-heading font-bold text-navy mb-2">Real-World Attempts at a Perfect Society</h1>
+            <div class="flex flex-col md:flex-row gap-4 mt-4 text-sm text-gray-600">
+                <div class="flex-1">
+                    <label class="font-bold">Name:</label>
+                    <input type="text" class="w-full border-b border-gray-400 focus:outline-none bg-transparent" placeholder="Enter your name">
+                </div>
+                <div class="w-full md:w-48">
+                    <label class="font-bold">Date:</label>
+                    <input type="date" class="w-full border-b border-gray-400 focus:outline-none bg-transparent">
+                </div>
+            </div>
+        </div>
+
+        <section id="intro" class="mb-12">
+            <p class="text-lg leading-relaxed mb-4">
+                The concept of a "Utopia"—a perfect place where everyone is happy and society runs smoothly—has fascinated humans for centuries. In the movie <em>Barbie</em>, "Barbieland" is presented as a place where gender inequality is solved and every day is perfect. However, in the real world, creating a perfect community is much more complicated. Throughout history, many groups have tried to build their own versions of paradise. Here are four famous examples of these experiments.
+            </p>
+        </section>
+
+        <section id="oneida" class="mb-16 bg-white p-6 rounded-lg shadow-sm border-l-4 border-gold">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-2/3">
+                    <h2 class="text-2xl font-heading font-bold text-navy mb-2">1. The Oneida Community (1848–1881)</h2>
+                    <p class="mb-4">Founded by John Humphrey Noyes in New York, USA, the Oneida Community was a religious group that believed humans could become perfect in this lifetime. They lived in a large shared mansion and believed in "Bible Communism," meaning they shared all property and work.</p>
+                    
+                    <h3 class="font-bold text-forest mt-4">What they tried to perfect:</h3>
+                    <p class="mb-2">They wanted to eliminate selfishness and traditional gender roles in marriage. They practiced "complex marriage," where every man was married to every woman, and children were raised by the whole community rather than just their parents.</p>
+                    
+                    <h3 class="font-bold text-forest mt-4">The Result:</h3>
+                    <p>The community was financially successful because they made high-quality animal traps and later, silverware. However, outside pressure and internal disagreements about their unconventional marriage practices led to their breakup in 1881. They transformed into a business corporation, Oneida Limited, which became famous for making cutlery (knives, forks, and spoons).</p>
+                </div>
+                <div class="md:w-1/3">
+                    <img src="https://images.unsplash.com/photo-1620371350502-999e9a7d80a4?q=80&w=800&auto=format&fit=crop" 
+                         alt="Antique silverware representing Oneida" 
+                         class="w-full h-48 object-cover rounded shadow cursor-pointer hover:opacity-90"
+                         @click="openModal('https://images.unsplash.com/photo-1620371350502-999e9a7d80a4?q=80&w=1200&auto=format&fit=crop', 'Oneida became famous for silverware manufacturing.')">
+                    <p class="text-xs text-gray-500 mt-2 italic">Click image to enlarge</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="fordlandia" class="mb-16 bg-white p-6 rounded-lg shadow-sm border-l-4 border-navy">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-2/3">
+                    <h2 class="text-2xl font-heading font-bold text-navy mb-2">2. Fordlândia, Brazil (1928–1934)</h2>
+                    <p class="mb-4">This was an industrial town built in the middle of the Amazon rainforest by American car tycoon Henry Ford. He wanted to secure a source of rubber for his car tires, but he also wanted to export the "American way of life" to Brazil.</p>
+                    
+                    <h3 class="font-bold text-forest mt-4">What he tried to perfect:</h3>
+                    <p class="mb-2">Ford wanted to create a model town with American-style houses, strict schedules, healthy activities (like square dancing), and a ban on alcohol. He believed efficient work and clean living would create a happy society.</p>
+                    
+                    <h3 class="font-bold text-forest mt-4">The Result:</h3>
+                    <p>It was a massive failure. The American managers did not understand the local culture or the Amazon environment. The rubber trees died because they were planted too close together, allowing disease to spread. The workers rebelled against the strict rules and cafeteria food. Ford eventually abandoned the project having never visited the town himself.</p>
+                </div>
+                <div class="md:w-1/3">
+                    <img src="https://images.unsplash.com/photo-1550100136-e0721016a944?q=80&w=800&auto=format&fit=crop" 
+                         alt="Overgrown industrial ruins" 
+                         class="w-full h-48 object-cover rounded shadow cursor-pointer hover:opacity-90"
+                         @click="openModal('https://images.unsplash.com/photo-1550100136-e0721016a944?q=80&w=1200&auto=format&fit=crop', 'Ruins in the jungle, similar to the abandoned Fordlândia site.')">
+                </div>
+            </div>
+        </section>
+
+        <section id="auroville" class="mb-16 bg-white p-6 rounded-lg shadow-sm border-l-4 border-gold">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-2/3">
+                    <h2 class="text-2xl font-heading font-bold text-navy mb-2">3. Auroville, India (1968–Present)</h2>
+                    <p class="mb-4">Auroville, or the "City of Dawn," was founded by Mirra Alfassa (known as "The Mother") near Pondicherry, India. It was designed to be a universal town where men and women of all countries are able to live in peace and progressive harmony, above all creeds, all politics and all nationalities.</p>
+                    
+                    <h3 class="font-bold text-forest mt-4">What they tried to perfect:</h3>
+                    <p class="mb-2">The goal is human unity. Auroville tries to eliminate the obsession with money and ownership. They focus on sustainable living, organic farming, and renewable energy. At the center of the town is the Matrimandir, a giant gold sphere used for meditation.</p>
+                    
+                    <h3 class="font-bold text-forest mt-4">The Result:</h3>
+                    <p>Auroville is the only community on this list that still exists today as a functioning town. However, it faces challenges with water shortages, disagreements over management, and the difficulty of living without a traditional economy. It remains an ongoing experiment in unity.</p>
+                </div>
+                <div class="md:w-1/3">
+                    <img src="https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=800&auto=format&fit=crop" 
+                         alt="Matrimandir style architecture" 
+                         class="w-full h-48 object-cover rounded shadow cursor-pointer hover:opacity-90"
+                         @click="openModal('https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=1200&auto=format&fit=crop', 'The Matrimandir is a large golden sphere at the center of Auroville.')">
+                </div>
+            </div>
+        </section>
+
+        <section id="venus" class="mb-16 bg-white p-6 rounded-lg shadow-sm border-l-4 border-navy">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-2/3">
+                    <h2 class="text-2xl font-heading font-bold text-navy mb-2">4. The Venus Project (Started 1970s)</h2>
+                    <p class="mb-4">Created by industrial designer Jacque Fresco in Florida, USA, The Venus Project is a futuristic plan for a society that relies on technology rather than politics to solve problems.</p>
+                    
+                    <h3 class="font-bold text-forest mt-4">What they tried to perfect:</h3>
+                    <p class="mb-2">They propose a "Resource-Based Economy." This means there is no money, barter, or debt. Instead, all resources are declared the common heritage of all Earth's inhabitants. They believe that if technology provides enough for everyone, greed and crime will disappear.</p>
+                    
+                    <h3 class="font-bold text-forest mt-4">The Result:</h3>
+                    <p>While it has not been built as a fully functioning city yet, there is a research center in Florida with futuristic buildings. It operates as an educational organization, promoting the idea that poverty and war are caused by the scarcity of resources, which technology could fix.</p>
+                </div>
+                <div class="md:w-1/3">
+                    <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?q=80&w=800&auto=format&fit=crop" 
+                         alt="Futuristic architecture" 
+                         class="w-full h-48 object-cover rounded shadow cursor-pointer hover:opacity-90"
+                         @click="openModal('https://images.unsplash.com/photo-1486325212027-8081e485255e?q=80&w=1200&auto=format&fit=crop', 'Futuristic concept designs typical of The Venus Project.')">
+                </div>
+            </div>
+        </section>
+
+        <hr class="border-navy mb-12">
+
+        <section id="resources">
+            <h2 class="text-3xl font-heading font-bold text-navy mb-6 bg-gray-200 p-2 border-l-8 border-gold">Student Resources</h2>
+
+            <div class="mb-10 page-break">
+                <h3 class="text-xl font-bold text-forest mb-3">A. Summary</h3>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li><strong>Utopias:</strong> Humans have frequently tried to create "perfect" societies to solve social problems, similar to the fictional Barbieland.</li>
+                    <li><strong>Oneida:</strong> A religious group in the 1800s that shared all property and family responsibilities; it eventually became a silverware company.</li>
+                    <li><strong>Fordlândia:</strong> Henry Ford's failed attempt to bring American industry and lifestyle to the Amazon rainforest.</li>
+                    <li><strong>Auroville:</strong> An international "City of Dawn" in India focused on human unity and sustainable living that still operates today.</li>
+                    <li><strong>The Venus Project:</strong> A futuristic concept that suggests using technology and a resource-based economy to eliminate poverty and crime.</li>
+                </ul>
+            </div>
+
+            <div class="mb-10">
+                <h3 class="text-xl font-bold text-forest mb-3">B. Vocabulary</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse border border-gray-300 shadow-sm">
+                        <thead>
+                            <tr class="bg-navy text-white">
+                                <th class="p-3 border border-gray-400">Word</th>
+                                <th class="p-3 border border-gray-400">Definition</th>
+                                <th class="p-3 border border-gray-400">Example Sentence</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white">
+                            <tr>
+                                <td class="p-3 border border-gray-300 font-bold">Utopia</td>
+                                <td class="p-3 border border-gray-300">An imagined place where everything is perfect.</td>
+                                <td class="p-3 border border-gray-300">The movie portrays a utopia where nobody ever fights or gets sad.</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-3 border border-gray-300 font-bold">Communal</td>
+                                <td class="p-3 border border-gray-300">Shared by all members of a community.</td>
+                                <td class="p-3 border border-gray-300">In the village, they cooked meals in a communal kitchen rather than in their own homes.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 border border-gray-300 font-bold">Scarcity</td>
+                                <td class="p-3 border border-gray-300">A shortage; the state of being in short supply.</td>
+                                <td class="p-3 border border-gray-300">The scarcity of water in the desert made it difficult for the farmers to grow crops.</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-3 border border-gray-300 font-bold">Sustainable</td>
+                                <td class="p-3 border border-gray-300">Able to be used without running out.</td>
+                                <td class="p-3 border border-gray-300">Solar power is a sustainable energy source because the sun will not run out.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 border border-gray-300 font-bold">Conventional</td>
+                                <td class="p-3 border border-gray-300">Normal, traditional, or generally believed.</td>
+                                <td class="p-3 border border-gray-300">The artist decided to paint on the walls instead of using a conventional canvas.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="quiz" class="mb-10 p-6 bg-white border border-gray-200 rounded-lg shadow-sm page-break">
+                <h3 class="text-xl font-bold text-forest mb-4">C. Comprehension Questions</h3>
+                
+                <div class="mb-6">
+                    <p class="font-bold mb-2">1. Which community famously transitioned from a religious group into a business selling silverware?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="q1" value="A" x-model="answers.q1" class="accent-navy"> <span>A) Fordlândia</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="q1" value="B" x-model="answers.q1" class="accent-navy"> <span>B) Auroville</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="q1" value="C" x-model="answers.q1" class="accent-navy"> <span>C) The Oneida Community</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="q1" value="D" x-model="answers.q1" class="accent-navy"> <span>D) The Venus Project</span>
+                        </label>
+                    </div>
+                    <div x-show="showResults" class="mt-2 text-sm font-bold" x-transition>
+                        <template x-if="answers.q1 === 'C'">
+                            <span class="text-green-600">✓ Correct! Oneida became Oneida Limited.</span>
+                        </template>
+                        <template x-if="answers.q1 !== 'C'">
+                            <span class="text-red-600">✗ Incorrect. Review Section 1.</span>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <p class="font-bold mb-2">2. Why did Henry Ford's "Fordlândia" ultimately fail?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="q2" value="A" x-model="answers.q2" class="accent-navy"> <span>A) The community ran out of money.</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="q2" value="B" x-model="answers.q2" class="accent-navy"> <span>B) Cultural clashes and environmental problems with the rubber trees.</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="q2" value="C" x-model="answers.q2" class="accent-navy"> <span>C) The government forced them to close.</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="q2" value="D" x-model="answers.q2" class="accent-navy"> <span>D) They decided to move to a different country.</span>
+                        </label>
+                    </div>
+                    <div x-show="showResults" class="mt-2 text-sm font-bold" x-transition>
+                        <template x-if="answers.q2 === 'B'">
+                            <span class="text-green-600">✓ Correct!</span>
+                        </template>
+                        <template x-if="answers.q2 !== 'B'">
+                            <span class="text-red-600">✗ Incorrect. Review Section 2.</span>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <p class="font-bold mb-2">3. What is the main economic idea behind The Venus Project?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="q3" value="A" x-model="answers.q3" class="accent-navy"> <span>A) Everyone should be paid the same salary.</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="q3" value="B" x-model="answers.q3" class="accent-navy"> <span>B) Gold should be the only currency.</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="q3" value="C" x-model="answers.q3" class="accent-navy"> <span>C) A Resource-Based Economy without money.</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="q3" value="D" x-model="answers.q3" class="accent-navy"> <span>D) Trading goods with neighboring towns.</span>
+                        </label>
+                    </div>
+                    <div x-show="showResults" class="mt-2 text-sm font-bold" x-transition>
+                        <template x-if="answers.q3 === 'C'">
+                            <span class="text-green-600">✓ Correct!</span>
+                        </template>
+                        <template x-if="answers.q3 !== 'C'">
+                            <span class="text-red-600">✗ Incorrect. Review Section 4.</span>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 no-print">
+                    <button @click="checkAnswers()" class="bg-navy text-white px-6 py-2 rounded hover:bg-forest transition shadow-lg font-bold">Check Answers</button>
+                    <button @click="resetQuiz()" class="text-gray-500 underline hover:text-navy">Retry</button>
+                </div>
+            </div>
+
+            <div class="mb-10 page-break">
+                <h3 class="text-xl font-bold text-forest mb-4">Short Answer</h3>
+                
+                <div class="mb-6">
+                    <label class="block font-bold mb-2">1. Select ONE of the communities from the text. What were the specific "ideals" or beliefs that this community was built upon?</label>
+                    <textarea class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-gold focus:outline-none" rows="4"></textarea>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block font-bold mb-2">2. Look at the "What they tried to perfect" sections. Choose one community and describe what aspect of normal society they tried to get rid of.</label>
+                    <textarea class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-gold focus:outline-none" rows="4"></textarea>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block font-bold mb-2">3. Compare the outcomes of Oneida and Auroville. How is the current status of these two communities different?</label>
+                    <textarea class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-gold focus:outline-none" rows="4"></textarea>
+                </div>
+            </div>
+
+            <div class="mb-10 bg-gray-100 p-6 rounded border-l-4 border-navy page-break">
+                <h3 class="text-xl font-bold text-navy mb-4">Critical Thinking</h3>
+                <p class="mb-3">In the movie Barbie, Barbieland is perfect for the Barbies but not for the Kens. Based on the reading passage, do you believe it is possible to create a Utopia that is perfect for everyone? Use evidence from at least one of the real-world examples to support your answer.</p>
+                <textarea class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-gold focus:outline-none bg-white" rows="6"></textarea>
+            </div>
+
+            <div id="activity" class="mb-10 border-2 border-dashed border-gray-400 p-6 rounded bg-white page-break">
+                <h3 class="text-xl font-bold text-forest mb-2">D. Suggested Activity: CER Draft</h3>
+                <p class="mb-4 text-sm text-gray-600">Prompt: Write a paragraph using the Claim, Evidence, Reasoning structure.</p>
+                <p class="font-bold mb-4">Question: Which of the four communities described had the most achievable goal?</p>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block font-bold text-navy text-sm mb-1">Claim:</label>
+                        <p class="text-xs text-gray-500 mb-1">I believe [Community Name] had the most achievable goal...</p>
+                        <input type="text" class="w-full p-2 border border-gray-300 rounded bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-navy text-sm mb-1">Evidence:</label>
+                        <p class="text-xs text-gray-500 mb-1">The text states that...</p>
+                        <textarea class="w-full p-2 border border-gray-300 rounded bg-gray-50" rows="3"></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-navy text-sm mb-1">Reasoning:</label>
+                        <p class="text-xs text-gray-500 mb-1">This proves the goal was achievable because...</p>
+                        <textarea class="w-full p-2 border border-gray-300 rounded bg-gray-50" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <button id="print-btn" onclick="window.print()" class="fixed bottom-6 right-6 bg-navy text-gold font-bold px-6 py-3 rounded-full shadow-xl hover:bg-forest transition z-50 flex items-center gap-2 border-2 border-gold">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+        Save as PDF
+    </button>
+
+    <div x-show="modalOpen" 
+         class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-90 image-modal"
+         x-transition:enter="opacity-0" x-transition:enter-end="opacity-100"
+         x-transition:leave="opacity-100" x-transition:leave-end="opacity-0"
+         style="display: none;">
+        
+        <div class="relative max-w-4xl max-h-screen p-4" @click.away="modalOpen = false">
+            <button @click="modalOpen = false" class="absolute -top-10 right-0 text-white text-4xl hover:text-gold">&times;</button>
+            <img :src="modalImg" class="max-w-full max-h-[85vh] rounded border border-gray-700 shadow-2xl">
+            <p x-text="modalCaption" class="text-center text-white mt-4 font-body text-sm bg-black bg-opacity-50 p-2 rounded"></p>
+        </div>
+    </div>
+
+</body>
+</html>

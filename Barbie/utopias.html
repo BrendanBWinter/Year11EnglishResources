@@ -32,16 +32,42 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/opendyslexic@2.1.0-beta1/font/opendyslexic.min.css" rel="stylesheet">
 
     <style>
+        /* FIX: Manually define OpenDyslexic here to ensure it loads 
+           without cross-origin errors on local files.
+        */
+        @font-face {
+            font-family: 'OpenDyslexic';
+            src: url('https://cdn.jsdelivr.net/npm/opendyslexic@2.1.0/fonts/OpenDyslexic-Regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'OpenDyslexic';
+            src: url('https://cdn.jsdelivr.net/npm/opendyslexic@2.1.0/fonts/OpenDyslexic-Bold.woff') format('woff');
+            font-weight: bold;
+            font-style: normal;
+        }
+
         /* Base styles */
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; transition: font-family 0.3s ease; }
         h1, h2, h3, h4 { font-family: 'Roboto Slab', serif; }
 
-        /* Dyslexia Override */
-        .dyslexic-mode, .dyslexic-mode * {
+        /* Dyslexia Override - using !important to force override Tailwind classes */
+        .dyslexic-mode, 
+        .dyslexic-mode h1, 
+        .dyslexic-mode h2, 
+        .dyslexic-mode h3, 
+        .dyslexic-mode h4, 
+        .dyslexic-mode p, 
+        .dyslexic-mode span, 
+        .dyslexic-mode button, 
+        .dyslexic-mode input, 
+        .dyslexic-mode textarea, 
+        .dyslexic-mode li {
             font-family: 'OpenDyslexic', sans-serif !important;
+            line-height: 1.6 !important; /* increased line height for readability */
         }
 
         /* Image Zoom Transition */
@@ -51,17 +77,9 @@
         @media print {
             @page { margin: 2cm; size: auto; }
             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; }
-            
-            /* Hide UI elements */
             #sidebar, #mobile-nav-toggle, #dyslexia-toggle, #print-btn, .no-print { display: none !important; }
-            
-            /* Expand content */
             #main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
-            
-            /* Ensure inputs are visible */
             textarea, input[type="text"] { border: 1px solid #000; color: #000; }
-            
-            /* Page breaks */
             .page-break { page-break-before: always; }
             section { page-break-inside: avoid; }
         }
@@ -94,7 +112,9 @@
     <header class="lg:hidden fixed top-0 w-full bg-navy text-white z-50 flex justify-between items-center p-4 shadow-md no-print">
         <h1 class="text-lg font-heading font-bold">Utopian Societies</h1>
         <div class="flex items-center gap-4">
-            <button @click="dyslexicMode = !dyslexicMode" class="text-gold font-bold text-sm border border-gold px-2 py-1 rounded hover:bg-gold hover:text-navy transition">
+            <button @click="dyslexicMode = !dyslexicMode" 
+                    class="text-gold font-bold text-sm border border-gold px-2 py-1 rounded hover:bg-gold hover:text-navy transition"
+                    :class="{ 'bg-gold text-navy': dyslexicMode }">
                 Aa
             </button>
             <button @click="sidebarOpen = !sidebarOpen" class="text-white focus:outline-none">
@@ -111,7 +131,9 @@
             <h2 class="text-2xl font-heading font-bold text-gold mb-2">Navigation</h2>
             <p class="text-xs text-gray-300 mb-6">Real-World Attempts at a Perfect Society</p>
             
-            <button @click="dyslexicMode = !dyslexicMode" class="w-full mb-6 flex items-center justify-center gap-2 bg-forest text-white py-2 rounded hover:bg-gold hover:text-navy transition border border-gray-600">
+            <button @click="dyslexicMode = !dyslexicMode" 
+                    class="w-full mb-6 flex items-center justify-center gap-2 py-2 rounded transition border border-gray-600"
+                    :class="dyslexicMode ? 'bg-gold text-navy font-bold' : 'bg-forest text-white hover:bg-gold hover:text-navy'">
                 <span x-text="dyslexicMode ? 'Disable Dyslexia Font' : 'Enable Dyslexia Font'"></span>
             </button>
 
